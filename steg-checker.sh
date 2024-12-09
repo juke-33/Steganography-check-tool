@@ -54,6 +54,37 @@ echo -e "\n[ 3 ] binwalk"
 binwalk -e "$FILE"
 echo -e "\n----------------------------------------------------"
 
+# Image File (JPEG, PNG) specific commands
+if [[ "$FILE_TYPE" == "image/jpeg" || "$FILE_TYPE" == "image/png" ]]; then
+  echo -e "\n[ 4 ] zsteg\n"
+  zsteg "$FILE"
+  echo -e "\n----------------------------------------------------"
+
+  if [[ "$FILE_TYPE" == "image/jpeg" ]]; then
+    echo -e "\n[ 5 ] steghide\n"
+    steghide extract -sf "$FILE" -p "$PASSWORD"
+    echo -e "\n----------------------------------------------------"
+
+    echo -e "\n[ 6 ] outguess\n"
+    outguess -r "$FILE" output.txt
+    if [ -f outguess_output.txt ]; then
+      echo -e "\n[ \e[32m✔\e[0m ] Outguess output saved to 'output.txt'."
+    else
+      echo -e "\n[ \e[31m✗\e[0m ] Outguess failed to extract any data."
+    fi
+    echo -e "\n----------------------------------------------------"
+  fi
+
+  if [[ "$FILE_TYPE" == "image/png" ]]; then
+    echo -e "\n[ 7 ] pngcheck\n"
+    pngcheck -v "$FILE"
+  elif [[ "$FILE_TYPE" == "image/jpeg" ]]; then
+    echo -e "\n[ 7 ] jpeginfo\n"
+    jpeginfo -c "$FILE"
+  fi
+  echo -e "\n----------------------------------------------------"
+fi
+
 # Audio File (WAV, MP3) specific commands
 if [[ "$FILE_TYPE" == "audio/x-wav" || "$FILE_TYPE" == "audio/mpeg" ]]; then
   echo -e "\n[ 8 ] ffmpeg\n"
